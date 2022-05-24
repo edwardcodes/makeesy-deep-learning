@@ -29,10 +29,10 @@ criterion = MSELoss()
 optimizer = torch.optim.SGD(model, lr=lr)
 # optimizer = torch.optim.Adam(model, lr=lr)
 
-for epoch in range(500):
+for _ in range(500):
     # Remove the grad computed in the last step
     optimizer.zero_grad()
-    print(f'model params')
+    print('model params')
     print(model[0])
     print(a)
     print(model[1])
@@ -57,17 +57,17 @@ for epoch in range(500):
         a = a - lr * a_grad
         b = b - lr * b_grad
 
-    print(f'model predictions')
+    print('model predictions')
     print(y_predicted)
     print(y_predicted_manually)
 
-    print(f'params grad')
+    print('params grad')
     print(model[0].grad)
     print(a_grad)
     print(model[1].grad)
     print(b_grad)
 
-    print(f'model loss')
+    print('model loss')
     print(loss)
     print(loss_manual)
 

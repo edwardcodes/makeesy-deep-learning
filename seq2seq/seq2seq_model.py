@@ -36,11 +36,7 @@ class MultiheadedAttention(nn.Module):
         # Create Q, K, and V using input vectors
         bs, seq, emb_dim = inputs.shape
 
-        if kv is not None:
-            kv = kv
-        else:
-            kv = inputs
-
+        kv = kv if kv is not None else inputs
         kv_bs, kv_seq, _ = kv.size()
 
         # Transpose: bs x seq-length x num-heads x heads_dim -> bs x num-heads x seq-length x heads_dim
@@ -72,8 +68,7 @@ class MultiheadedAttention(nn.Module):
         # Reshape the weighted values
         # Transpose: bs x seq-length x num-heads x heads_dim -> bs x seq-length x num-heads x heads_dim)
         output = output.transpose(1, 2).contiguous().view(bs, -1, self.heads * self.heads_dim)
-        output_final = self.unify_heads(output)
-        return output_final
+        return self.unify_heads(output)
 
 
 class TransformerEncoderLayer(nn.Module):
@@ -107,7 +102,7 @@ class TransformerEncoderLocal(nn.Module):
         super(TransformerEncoderLocal, self).__init__()
 
         self.enc_layers = nn.ModuleList()
-        for i in range(num_layers):
+        for _ in range(num_layers):
             self.enc_layers.append(TransformerEncoderLayer(d_model, num_heads=num_heads))
 
         self.norm = nn.LayerNorm(d_model)
@@ -164,7 +159,7 @@ class TransformerDecoderLocal(nn.Module):
         super(TransformerDecoderLocal, self).__init__()
 
         self.enc_layers = nn.ModuleList()
-        for i in range(num_layers):
+        for _ in range(num_layers):
             self.enc_layers.append(TransformerDecoderLayer(d_model, num_heads=num_heads))
 
         self.norm = nn.LayerNorm(d_model)
@@ -208,8 +203,7 @@ class EncoderDecoder(nn.Module):
     def forward(self, x, y, src_mask=None, trg_make=None):
         hidden_states, memory = self.encode(x, src_mask)
         hidden_states, tensor = self.decode(y, memory, src_mask, trg_make)
-        logits = self.generator(tensor)
-        return logits
+        return self.generator(tensor)
 
 
 if __name__ == '__main__':

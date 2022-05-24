@@ -28,7 +28,7 @@ criterion = MSELoss()
 # optimizer = torch.optim.SGD(model, lr=0.1)
 optimizer = torch.optim.Adam(model, lr=0.1)
 
-for epoch in range(500):
+for _ in range(500):
     # Remove the grad computed in the last step
     optimizer.zero_grad()
     # Run a + bx

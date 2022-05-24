@@ -29,8 +29,7 @@ if __name__ == '__main__':
     save_output = SaveOutput()
     hook_handles = []
     for layer in model.modules():
-        if isinstance(layer, torch.nn.modules.Linear) or \
-                isinstance(layer, torch.nn.modules.ReLU):
+        if isinstance(layer, (torch.nn.modules.Linear, torch.nn.modules.ReLU)):
             handle = layer.register_forward_hook(save_output)
             hook_handles.append(handle)
 

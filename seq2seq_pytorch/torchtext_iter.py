@@ -44,7 +44,7 @@ class BatchSampler(Sampler):
         pooled_indices_only = [x[0] for x in pooled_indices]
         # yield indices for current batch
         j = 0
-        for i in range(0, len(pooled_indices)):
+        for i in range(len(pooled_indices)):
             so_for = self.batch_size_fn(pooled_indices[i], j)
             if so_for < self.batch_size:
                 j += 1

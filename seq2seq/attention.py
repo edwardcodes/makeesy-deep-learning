@@ -30,11 +30,7 @@ class MultiheadedAttention(nn.Module):
         # Create Q, K, and V using input vectors
         bs, seq, emb_dim = inputs.shape
 
-        if kv is not None:
-            kv = kv
-        else:
-            kv = inputs
-
+        kv = kv if kv is not None else inputs
         kv_bs, kv_seq_len, _ = kv.size()
 
         # Transpose: bs x seq-length x num-heads x heads_dim -> bs x num-heads x seq-length x heads_dim
@@ -64,5 +60,4 @@ class MultiheadedAttention(nn.Module):
         # Reshape the weighted values
         # Transpose: bs x seq-length x num-heads x heads_dim -> bs x seq-length x num-heads x heads_dim)
         output = output.transpose(1, 2).contiguous().view(bs, seq, self.heads * self.heads_dim)
-        output_final = self.unify_heads(output)
-        return output_final
+        return self.unify_heads(output)

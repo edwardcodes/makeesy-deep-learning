@@ -50,7 +50,7 @@ class BatchSampler(Sampler):
         pooled_indices_only = [x[0] for x in pooled_indices]
         # yield indices for current batch
         j = 0
-        for i in range(0, len(pooled_indices)):
+        for i in range(len(pooled_indices)):
             sofor = self.batch_size_fn(pooled_indices[i], j)
             if sofor < self.batch_size:
                 j += 1
@@ -110,7 +110,12 @@ def create_vocab(file_path, max_vocab):
 
 def generate_square_subsequent_mask(sz):
     mask = (torch.triu(torch.ones((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
-    mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+    mask = (
+        mask.float()
+        .masked_fill(mask == 0, float('-inf'))
+        .masked_fill(mask == 1, 0.0)
+    )
+
     return mask
 
 
@@ -160,7 +165,7 @@ if train:
     steps = 0
     total_loss = 0
     for epoch in range(EPOCHS):
-        for idx, (src, tgt) in enumerate(train_iter):
+        for src, tgt in train_iter:
             src = src.to(DEVICE)
             tgt = tgt.to(DEVICE)
             tgt_input = tgt[:-1, :]
@@ -194,7 +199,7 @@ if train:
 count = 0
 with torch.no_grad():
     model.eval()
-    for idx, (src, tgt) in enumerate(train_iter):
+    for src, tgt in train_iter:
         src = src.to(DEVICE)
         tgt = tgt.to(DEVICE)
         num_tokens = src.size(0)
@@ -202,7 +207,7 @@ with torch.no_grad():
 
         memory = model.encode(src, src_mask)
         ys = torch.ones(1, 1).type_as(src.data).fill_(BOS_IDX)
-        for i in range(100):
+        for _ in range(100):
             tgt_mask = (generate_square_subsequent_mask(ys.size(0))
                         .type(torch.bool)).to(DEVICE)
             out = model.decode(ys, memory, tgt_mask)

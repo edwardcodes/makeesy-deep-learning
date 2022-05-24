@@ -19,6 +19,7 @@
 Functions to generate various toy datasets.
 """
 
+
 import argparse
 import os
 import numpy as np
@@ -46,7 +47,7 @@ PARSER.add_argument(
     required=True)
 ARGS = PARSER.parse_args()
 
-VOCABULARY = list([str(x) for x in range(ARGS.vocab_size - 1)])
+VOCABULARY = [str(x) for x in range(ARGS.vocab_size - 1)]
 VOCABULARY += ["笑"]
 
 
@@ -68,7 +69,7 @@ def make_copy(num_examples, min_len, max_len):
         source_tokens = np.random.choice(
             list(VOCABULARY), size=turn_length, replace=True)
         target_tokens = source_tokens
-        yield " ".join(source_tokens), " ".join(target_tokens)
+        yield (" ".join(target_tokens), " ".join(target_tokens))
 
 
 def make_reverse(num_examples, min_len, max_len):
@@ -109,12 +110,12 @@ def write_parallel_text(sources, targets, output_prefix):
     with io.open(source_filename, "w", encoding='utf8') as source_file:
         for record in sources:
             source_file.write(record + "\n")
-    print("Wrote {}".format(source_filename))
+    print(f"Wrote {source_filename}")
 
     with io.open(target_filename, "w", encoding='utf8') as target_file:
         for record in targets:
             target_file.write(record + "\n")
-    print("Wrote {}".format(target_filename))
+    print(f"Wrote {target_filename}")
 
 
 def main():

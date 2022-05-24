@@ -32,7 +32,7 @@ if __name__ == '__main__':
     save_model = PruneLinearLayer(param_names=['weight', 'bias'], amount=[0.8, 0.2])
     model = ModelNet(input_size=inp_dim, num_hidden_layers=1)
     hooks = []
-    for idx, layer in enumerate(model.modules()):
+    for layer in model.modules():
         if isinstance(layer, nn.modules.Linear):
             hook = layer.register_forward_pre_hook(save_model)
             hooks.append(hook)

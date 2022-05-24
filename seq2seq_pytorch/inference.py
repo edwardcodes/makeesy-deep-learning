@@ -20,7 +20,12 @@ def generate_batch(data_batch):
 
 def generate_square_subsequent_mask(sz):
     mask = (torch.triu(torch.ones((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
-    mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+    mask = (
+        mask.float()
+        .masked_fill(mask == 0, float('-inf'))
+        .masked_fill(mask == 1, 0.0)
+    )
+
     return mask
 
 
@@ -58,7 +63,7 @@ count = 0
 with torch.no_grad():
     model = load_model('models/pytorch_model.bin')
     model.eval()
-    for idx, (src, tgt) in enumerate(test_iter):
+    for src, tgt in test_iter:
         src = src.to(DEVICE)
         tgt = tgt.to(DEVICE)
         num_tokens = src.size(0)
@@ -66,7 +71,7 @@ with torch.no_grad():
 
         memory = model.encode(src, src_mask)
         ys = torch.ones(1, 1).type_as(src.data).fill_(BOS_IDX)
-        for i in range(100):
+        for _ in range(100):
             tgt_mask = (generate_square_subsequent_mask(ys.size(0))
                         .type(torch.bool)).to(DEVICE)
             out = model.decode(ys, memory, tgt_mask)
