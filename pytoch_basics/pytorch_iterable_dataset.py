@@ -31,9 +31,7 @@ class TextDatasetIterable(IterableDataset):
         itr_tgt = open(self.tgt_file)
 
         zip_iter = zip(itr_src, itr_tgt)
-        mapped_itr = map(self.preprocess, zip_iter)
-
-        return mapped_itr
+        return map(self.preprocess, zip_iter)
 
 
 def create_vocab(file_path, max_vocab):

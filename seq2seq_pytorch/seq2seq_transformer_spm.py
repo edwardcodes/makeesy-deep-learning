@@ -104,8 +104,7 @@ class Seq2SeqTransformer(nn.Module):
                               tgt_key_padding_mask=tgt_key_padding_mask,
                               memory_key_padding_mask=memory_key_padding_mask
                               )
-        logits = self.generator(tensor)
-        return logits
+        return self.generator(tensor)
 
 
 def generate_batch(data_batch):
@@ -120,7 +119,12 @@ def generate_batch(data_batch):
 
 def generate_square_subsequent_mask(sz):
     mask = (torch.triu(torch.ones((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
-    mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+    mask = (
+        mask.float()
+        .masked_fill(mask == 0, float('-inf'))
+        .masked_fill(mask == 1, 0.0)
+    )
+
     return mask
 
 
@@ -174,8 +178,8 @@ if __name__ == '__main__':
 
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     # device = 'cpu'
-    src_file = args.train + '.' + args.source
-    tgt_file = args.train + '.' + args.target
+    src_file = f'{args.train}.{args.source}'
+    tgt_file = f'{args.train}.{args.target}'
     sp = spm.SentencePieceProcessor(model_file=args.spm,
                                     add_bos=True, add_eos=True)
     # train_data = load_data(src_file, tgt_file, sp)
@@ -203,7 +207,7 @@ if __name__ == '__main__':
         steps = 0
         total_loss = 0
         for epoch in range(args.epochs):
-            for idx, (src, tgt) in enumerate(train_iter):
+            for src, tgt in train_iter:
                 src = src.to(DEVICE)
                 tgt = tgt.to(DEVICE)
                 tgt_input = tgt[:-1, :]
@@ -239,8 +243,8 @@ if __name__ == '__main__':
             # Save the model
             save_model(model, args.model_file)
 
-    src_file = args.test + '.' + args.source
-    tgt_file = args.test + '.' + args.target
+    src_file = f'{args.test}.{args.source}'
+    tgt_file = f'{args.test}.{args.target}'
 
     test_data = TextDatasetIterableSPM(src_file, tgt_file, sp)
     test_iter = DataLoader(test_data, batch_size=args.batch_size,
@@ -249,7 +253,7 @@ if __name__ == '__main__':
     with torch.no_grad():
         model = load_model(args.model_file)
         model.eval()
-        for idx, (src, tgt) in enumerate(test_iter):
+        for src, tgt in test_iter:
             src = src.to(DEVICE)
             tgt = tgt.to(DEVICE)
             num_tokens = src.size(0)
@@ -257,7 +261,7 @@ if __name__ == '__main__':
 
             memory = model.encode(src, src_mask)
             ys = torch.ones(1, 1).type_as(src.data).fill_(BOS_IDX)
-            for i in range(100):
+            for _ in range(100):
                 tgt_mask = (generate_square_subsequent_mask(ys.size(0))
                             .type(torch.bool)).to(DEVICE)
                 out = model.decode(ys, memory, tgt_mask)

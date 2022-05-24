@@ -77,11 +77,7 @@ for i in range(len(x)):
     # Apply softmax to get probability scores of relevance
     relevance_scores = softmax(relevance, axis=-1)
     # relevance_scores = relevance_scores.round(decimals=1)
-    out = 0
-    # Each values-row is multiplied with relevance score and added point-wise
-    for k in range(len(relevance)):
-        # Here value[k] :is vector (of head_dim), and relevance_scores[k]: is a scalar score
-        out += value[k] * relevance_scores[k]
+    out = sum(value[k] * relevance_scores[k] for k in range(len(relevance)))
     this_query_contextual.append(out.round(decimals=1))
 
 print(np.stack(this_query_contextual))

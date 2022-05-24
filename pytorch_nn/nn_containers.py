@@ -16,11 +16,12 @@ class NeuralNet(nn.Module):
             self.deep_nn.add_module(f'ff{i}', nn.Linear(input_size, hidden_layer_size))
             self.deep_nn.add_module(f'activation{i}', nn.ReLU())
             input_size = hidden_layer_size
-        self.deep_nn.add_module(f'classifier', nn.Linear(hidden_layer_size, output_size))
+        self.deep_nn.add_module(
+            'classifier', nn.Linear(hidden_layer_size, output_size)
+        )
 
     def forward(self, inputs):
-        tensor = self.deep_nn(inputs)
-        return tensor
+        return self.deep_nn(inputs)
 
 
 x = torch.rand(4, 16)

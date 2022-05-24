@@ -13,8 +13,7 @@ class NeuralNet(nn.Module):
         self.flatten = nn.Flatten()
 
     def forward(self, x):
-        tensor = self.flatten(x)
-        return tensor
+        return self.flatten(x)
 
 
 x = torch.rand(2, 2, 2, 2, 2, 2)

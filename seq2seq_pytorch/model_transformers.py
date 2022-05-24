@@ -96,5 +96,4 @@ class Seq2SeqTransformer(nn.Module):
                               tgt_key_padding_mask=tgt_key_padding_mask,
                               memory_key_padding_mask=memory_key_padding_mask
                               )
-        logits = self.generator(tensor)
-        return logits
+        return self.generator(tensor)

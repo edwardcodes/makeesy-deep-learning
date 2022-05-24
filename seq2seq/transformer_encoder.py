@@ -41,7 +41,7 @@ class TransformerEncoder(nn.Module):
         super(TransformerEncoder, self).__init__()
 
         self.enc_layers = nn.ModuleList()
-        for i in range(num_layers):
+        for _ in range(num_layers):
             self.enc_layers.append(TransformerEncoderLayer(d_model, num_heads=num_heads))
 
         self.norm = nn.LayerNorm(d_model)

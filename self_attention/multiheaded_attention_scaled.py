@@ -94,8 +94,7 @@ class SelfAttention(nn.Module):
         # Reshape the weighted values
         # Transpose: bs x seq-length x num-heads x heads_dim -> bs x seq-length x num-heads x heads_dim)
         output = output.transpose(1, 2).contiguous().view(bs, seq, self.heads * self.heads_dim)
-        output_final = self.unify_heads(output)
-        return output_final
+        return self.unify_heads(output)
 
 
 if __name__ == '__main__':

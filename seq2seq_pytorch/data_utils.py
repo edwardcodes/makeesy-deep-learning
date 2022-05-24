@@ -48,11 +48,9 @@ class TextDatasetIterable(IterableDataset):
                 torch.tensor(sample_tgt_idx, dtype=torch.long))
 
     def __iter__(self):
-        with open(self.src_file, encoding='utf8') as itr_src, \
-                open(self.tgt_file, encoding='utf8') as itr_tgt:
+        with open(self.src_file, encoding='utf8') as itr_src, open(self.tgt_file, encoding='utf8') as itr_tgt:
             zip_iter = zip(itr_src, itr_tgt)
-            mapped_itr = map(self.preprocess, zip_iter)
-            return mapped_itr
+            return map(self.preprocess, zip_iter)
 
 
 class TextDatasetIterableSPM(IterableDataset):
